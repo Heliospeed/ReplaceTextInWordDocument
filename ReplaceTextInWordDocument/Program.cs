@@ -1,7 +1,6 @@
-﻿// See https://aka.ms/new-console-template for more information
-using ReplaceTextInWordDocument;
+﻿using ReplaceTextInWordDocument;
 
-var docx = new Docx("../example/example.docx");
+using var docx = new Docx("../example/example.docx");
 
 docx.ReplaceText("#name", "John Doe");
 docx.ReplaceText("#year", DateTime.Now.Year.ToString());

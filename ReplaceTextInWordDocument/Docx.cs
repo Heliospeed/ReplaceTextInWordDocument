@@ -7,10 +7,10 @@ using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace ReplaceTextInWordDocument
 {
-    public class Docx
+    public class Docx: IDisposable
     {
-        public MemoryStream WordDocumentIn { get; set; }       
-        public MemoryStream WordDocumentOut { get; set; }
+        public MemoryStream WordDocumentIn { get; private set; }       
+        public MemoryStream WordDocumentOut { get; private set; }
         public Docx(string inputFileName)
         {
             this.WordDocumentIn = new MemoryStream();
@@ -137,7 +137,7 @@ namespace ReplaceTextInWordDocument
 
             // OpenXML 3
             wordDoc.MainDocumentPart.Document.Save();
-            
+
             this.WordDocumentOut = new MemoryStream();
             wordDoc.Clone(this.WordDocumentOut);
         }
@@ -153,6 +153,14 @@ namespace ReplaceTextInWordDocument
             }
 
             return true;
+        }
+
+        public void Dispose()
+        {
+            this.WordDocumentIn?.Dispose();
+            this.WordDocumentOut?.Dispose();
+            
+            GC.SuppressFinalize(this);
         }
     }
 }
