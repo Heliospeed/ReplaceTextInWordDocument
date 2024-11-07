@@ -64,14 +64,22 @@ namespace ReplaceTextInWordDocument
                 {
                     fullText.Append(text.Text);
                     textElements.Add(text);
+                    
+                    var fullString = fullText.ToString();
+
+                    // Si l'index de depart de la recherche est supérieur à la chaine complète (cas bloc vide) pas de recherche on ajoute le bloc suivant.
+                    if (fullString.Length <= lastIndex)
+                    {
+                        continue;
+                    }
 
                     // Vérification si le texte reconstitué contient le chaine à remplacer.
-                    int index = fullText.ToString().IndexOf(oldValue, lastIndex, StringComparison.InvariantCultureIgnoreCase);
+                    int index = fullString.IndexOf(oldValue, lastIndex, StringComparison.InvariantCultureIgnoreCase);
                     if (index > 0) {
                         ReplaceTextFragements(textElements, index, oldValue.Length, newValue);
 
-                        var newText = Regex.Replace(fullText.ToString(), Regex.Escape(oldValue), new string(' ', newValue.Length), RegexOptions.IgnoreCase);
-                        fullText.Clear().Append(newText);
+                        fullString = Regex.Replace(fullString, Regex.Escape(oldValue), new string(' ', newValue.Length), RegexOptions.IgnoreCase);
+                        fullText.Clear().Append(fullString);
 
                         lastIndex = index + 1;
                         //break;
