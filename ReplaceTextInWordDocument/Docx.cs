@@ -137,17 +137,13 @@ namespace ReplaceTextInWordDocument
 
             // OpenXML 3
             wordDoc.MainDocumentPart.Document.Save();
+            
             this.WordDocumentOut = new MemoryStream();
             wordDoc.Clone(this.WordDocumentOut);
         }
 
         public bool Save(string outputFileName){
             var fileFullName = outputFileName;
-
-            // Test que l'on ne remonte pas dans le dossier parent
-            if (Regex.IsMatch(fileFullName, @"(\.\.)(\/|\\)")){
-                return false;
-            }
 
             try {
                 File.WriteAllBytes(fileFullName, this.WordDocumentOut.ToArray());
@@ -158,6 +154,5 @@ namespace ReplaceTextInWordDocument
 
             return true;
         }
-
     }
 }
