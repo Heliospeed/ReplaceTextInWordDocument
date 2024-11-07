@@ -42,14 +42,14 @@ Le code principal pour remplacer le texte est dans la méthode `ReplaceText`. Vo
 using ReplaceTextInWordDocument;
 
 // Chargement du document Word
-var docx = new Docx("/Users/heliospeed/sources/ReplaceTextInWordDocument/example/example.docx");
+using var docx = new Docx("../example/example.docx");
 
 // Remplacement consécutif dans un word (le rempalecement est volonairement insensible à la casse)
 docx.ReplaceText("#name", "John Doe");
 docx.ReplaceText("#year", DateTime.Now.Year.ToString());
 
 // Sauvegarde de la nouvelle version du document
-docx.SaveFile("/Users/heliospeed/sources/ReplaceTextInWordDocument/example/exampleOut.docx");
+docx.Save("../example/exampleOut.docx");
 ```
 
 ### 4. Exécuter le programme
