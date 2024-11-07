@@ -27,6 +27,15 @@ namespace ReplaceTextInWordDocument
             }
         }
 
+        public Docx(Stream inputFileStream)
+        {
+            this.WordDocumentIn = new MemoryStream();
+            this.WordDocumentOut = new MemoryStream();
+
+            inputFileStream.CopyTo(this.WordDocumentIn);
+            this.WordDocumentIn.Position = 0;
+        }
+
         public void ReplaceText(string oldValue, string newValue)
         {
             this.WordDocumentIn.Position = 0;
@@ -128,13 +137,6 @@ namespace ReplaceTextInWordDocument
                 return;
             }
 
-            // OpenXML 2
-            // using  (var sw = new StreamWriter(wordDoc.MainDocumentPart.GetStream(FileMode.Create)))
-            // {
-            //     sw.Write(textElements);
-            // }
-            // wordDoc.Save();
-
             // OpenXML 3
             wordDoc.MainDocumentPart.Document.Save();
 
@@ -159,7 +161,7 @@ namespace ReplaceTextInWordDocument
         {
             this.WordDocumentIn?.Dispose();
             this.WordDocumentOut?.Dispose();
-            
+
             GC.SuppressFinalize(this);
         }
     }
