@@ -75,14 +75,22 @@ namespace ReplaceTextInWordDocument
 
                     // Vérification si le texte reconstitué contient le chaine à remplacer.
                     int index = fullString.IndexOf(oldValue, lastIndex, StringComparison.InvariantCultureIgnoreCase);
-                    if (index > 0) {
+                    if (index >= 0) {
                         ReplaceTextFragements(textElements, index, oldValue.Length, newValue);
-
-                        fullString = Regex.Replace(fullString, Regex.Escape(oldValue), new string(' ', newValue.Length), RegexOptions.IgnoreCase);
-                        fullText.Clear().Append(fullString);
-
                         lastIndex = index + 1;
                         //break;
+                        
+                        // Vérification que le dernier fragment ne contenait pas le même mot clé à remplacer
+                        var fragmentLast = textElements.Last().InnerText;
+                        int indexNext = fragmentLast.IndexOf(oldValue, 0, StringComparison.CurrentCultureIgnoreCase);
+                        if (indexNext >= 0) {
+                            // Il y a encore 1 ou plusieurs remplacements.
+                            textElements.Last().Text = Regex.Replace(textElements.Last().Text, Regex.Escape(oldValue), newValue, RegexOptions.IgnoreCase);
+                            lastIndex += indexNext + 1;
+                        }
+                        
+                        fullString = Regex.Replace(fullString, Regex.Escape(oldValue), new string(' ', newValue.Length), RegexOptions.IgnoreCase);
+                        fullText.Clear().Append(fullString);
                     }
                 }
 
@@ -94,8 +102,6 @@ namespace ReplaceTextInWordDocument
         {
             int currentIndex = 0;
             int remainingLength = length;
-
-            var replacementText = new StringBuilder(newText);
             var replacedAtOnce = false;
 
             foreach (var text in textElements)  
@@ -108,17 +114,15 @@ namespace ReplaceTextInWordDocument
                 }
 
                 var localStart = Math.Max(0, startIndex - currentIndex);
-                var localEnd = Math.Min(currentText.Length, startIndex + remainingLength - currentIndex);
-
+                var localEnd = Math.Min(currentText.Length, startIndex - currentIndex + remainingLength);
+                var replacementLength = localEnd - localStart;
+                
                 if (localStart <= localEnd){
-                    var replacementLength = localEnd - localStart;
-                    var replacedChar = replacementLength;
-
                     if (remainingLength > 0){
                         if (!replacedAtOnce){
                             // Remplacement complet même si c'est un fragment
                             text.Text = currentText.Remove(localStart, replacementLength)
-                                                   .Insert(localStart, replacementText.ToString());
+                                                   .Insert(localStart, newText);
                             replacedAtOnce = true;
                         }
                         else{
@@ -127,11 +131,11 @@ namespace ReplaceTextInWordDocument
                         }
                     }
 
-                    remainingLength -= replacedChar;
+                    remainingLength -= replacementLength;
                 }
 
                 currentIndex += currentText.Length;
-                startIndex += currentText.Length;
+                startIndex += replacementLength;
 
                 if (remainingLength <= 0){
                     break;
